@@ -4,7 +4,7 @@ import com.codecool.shop.dao.implementation.*;
 import org.json.JSONObject;
 
 import com.codecool.shop.model.User;
-import com.codecool.shop.model.ShoppingCart;
+import com.codecool.shop.dao.implementation.ShoppingCartDaoDB;
 
 import com.codecool.shop.dao.ProductCategoryDao;
 import com.codecool.shop.dao.ProductDao;
@@ -88,7 +88,7 @@ public class ProductController extends HttpServlet {
             resp.getWriter().print(json);
 
         } else {
-            ShoppingCart shoppingCart = getShoppingCart(req);
+            ShoppingCartDaoDB shoppingCart = getShoppingCart(req);
 
             context.setVariable("total_price", shoppingCart.sumCart());
             context.setVariable("number_of_items", shoppingCart.getNumberOfItems());
@@ -106,7 +106,7 @@ public class ProductController extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
         String productId = request.getParameter("id");
-        ShoppingCart shoppingCart = getShoppingCart(request);
+        ShoppingCartDaoDB shoppingCart = getShoppingCart(request);
 
         shoppingCart.addItem(Integer.parseInt(productId));
 
@@ -121,7 +121,7 @@ public class ProductController extends HttpServlet {
         response.getWriter().print(json);
     }
 
-    private ShoppingCart getShoppingCart(HttpServletRequest request) {
+    private ShoppingCartDaoDB getShoppingCart(HttpServletRequest request) {
         HttpSession session;
         session = request.getSession();
         if (session.isNew()) {

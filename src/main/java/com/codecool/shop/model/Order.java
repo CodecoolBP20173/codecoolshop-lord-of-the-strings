@@ -1,5 +1,7 @@
 package com.codecool.shop.model;
 
+import com.codecool.shop.dao.implementation.ShoppingCartDaoDB;
+
 public class Order {
 
     public static enum Status {
@@ -13,9 +15,9 @@ public class Order {
     private Address shippingAddress;
     private int phone;
     private Status status;
-    ShoppingCart orderShoppingCart;
+    ShoppingCartDaoDB orderShoppingCart;
 
-    public Order(String name, String email, Address billingAddress, Address shippingAddress, int phone, ShoppingCart shoppingCart) {
+    public Order(String name, String email, Address billingAddress, Address shippingAddress, int phone, ShoppingCartDaoDB shoppingCart) {
         this.orderShoppingCart = shoppingCart;
         this.name = name;
         this.email = email;

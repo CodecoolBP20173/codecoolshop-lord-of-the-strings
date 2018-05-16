@@ -2,7 +2,7 @@ package com.codecool.shop.controller;
 
 import org.json.JSONObject;
 import com.codecool.shop.config.TemplateEngineUtil;
-import com.codecool.shop.model.ShoppingCart;
+import com.codecool.shop.dao.implementation.ShoppingCartDaoDB;
 import com.codecool.shop.model.User;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.WebContext;
@@ -25,7 +25,7 @@ public class ShoppingCartController extends HttpServlet{
         }
         User user = (User)session.getAttribute("UserObject");
 
-        ShoppingCart shoppingCart = user.shoppingCart;
+        ShoppingCartDaoDB shoppingCart = user.shoppingCart;
 
 
 
@@ -45,7 +45,7 @@ public class ShoppingCartController extends HttpServlet{
         }
         User user = (User)session.getAttribute("UserObject");
 
-        ShoppingCart shoppingCart = user.shoppingCart;
+        ShoppingCartDaoDB shoppingCart = user.shoppingCart;
 
         int id = Integer.parseInt(request.getParameter("id"));
 

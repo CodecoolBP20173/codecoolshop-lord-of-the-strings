@@ -55,7 +55,7 @@ public class ProductController extends HttpServlet {
             products = productDataStore.getAll();
         } else if (category != null && supplier == null) {
             products = productDataStore.getBy(category);
-        } else if (supplier != null && category==null) {
+        } else if (supplier != null && category == null) {
             products = productDataStore.getBy(supplier);
         } else {
             products = productDataStore.getBy(supplier, category);

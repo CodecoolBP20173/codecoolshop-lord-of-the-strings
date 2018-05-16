@@ -38,17 +38,15 @@ public class ProductController extends HttpServlet {
         SupplierDao supplierDataStore = SupplierDaoDB.getInstance();
         ProductDao productDataStore = ProductDaoDB.getInstance();
         ProductCategoryDao productCategoryDataStore = ProductCategoryDaoDB.getInstance();
-        ProductCategory category;
-        Supplier supplier;
 
-        category = getProductCategory(req, productCategoryDataStore);
-        supplier = getSupplier(req, supplierDataStore);
-
+        ProductCategory category = getProductCategory(req, productCategoryDataStore);
+        Supplier supplier = getSupplier(req, supplierDataStore);
         List<Product> products = supplierDataStore.filterProducts(
                 productCategoryDataStore.filterProducts(
                         productDataStore.getAll(), category), supplier);
-
-        loadPage(req, resp, engine, context, supplierDataStore, productCategoryDataStore, category, supplier, products);
+        loadPage(req, resp, engine, context,
+                supplierDataStore, productCategoryDataStore,
+                category, supplier, products);
     }
 
     private void loadPage(HttpServletRequest req, HttpServletResponse resp,
@@ -95,8 +93,7 @@ public class ProductController extends HttpServlet {
     private void sendJson(HttpServletResponse resp, List<Product> products) throws IOException {
         JSONObject json = new JSONObject();
         int numberOfProducts = 0;
-        for (Product product : products)
-        {
+        for (Product product : products) {
             json.put("Product" + numberOfProducts, new JSONObject()
                     .put("title", product.getName())
                     .put("description", product.getDescription())
@@ -127,7 +124,8 @@ public class ProductController extends HttpServlet {
     }
 
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
 
         String productId = request.getParameter("id");
         ShoppingCart shoppingCart = getShoppingCart(request);

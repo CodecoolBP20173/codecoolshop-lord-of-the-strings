@@ -53,13 +53,35 @@ public class ProductDaoMem implements ProductDao {
         return data;
     }
 
+
+    /**
+     * Gets all products by supplier
+     * @param supplier supplier object with id, name etc.
+     * @return list of products
+     */
     @Override
     public List<Product> getBy(Supplier supplier) {
         return data.stream().filter(t -> t.getSupplier().equals(supplier)).collect(Collectors.toList());
     }
 
+    /**
+     * Gets all products by category
+     * @param productCategory productCategory object with id, name, etc.
+     * @return a list of products
+     */
     @Override
     public List<Product> getBy(ProductCategory productCategory) {
         return data.stream().filter(t -> t.getProductCategory().equals(productCategory)).collect(Collectors.toList());
+    }
+
+    /**
+     * Get all products by supplier and category
+     * @param supplier a mentor with name, id, etc.
+     * @param category
+     * @return a list of products
+     */
+    @Override
+    public List<Product> getBy(Supplier supplier, ProductCategory category) {
+        return data.stream().filter(t -> t.getProductCategory().equals(category) && t.getSupplier().equals(supplier)).collect(Collectors.toList());
     }
 }

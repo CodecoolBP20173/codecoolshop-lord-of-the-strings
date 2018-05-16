@@ -38,15 +38,29 @@ public class ProductController extends HttpServlet {
         SupplierDao supplierDataStore = SupplierDaoDB.getInstance();
         ProductDao productDataStore = ProductDaoDB.getInstance();
         ProductCategoryDao productCategoryDataStore = ProductCategoryDaoDB.getInstance();
-
         ProductCategory category = getProductCategory(req, productCategoryDataStore);
         Supplier supplier = getSupplier(req, supplierDataStore);
-        List<Product> products = supplierDataStore.filterProducts(
-                productCategoryDataStore.filterProducts(
-                        productDataStore.getAll(), category), supplier);
+        List<Product> products = getProducts(productDataStore, category, supplier);
+
+        if (category == null) category = productCategoryDataStore.getDefaultCategory();
+        if (supplier == null) supplier= supplierDataStore.getDefaultSupplier();
         loadPage(req, resp, engine, context,
                 supplierDataStore, productCategoryDataStore,
                 category, supplier, products);
+    }
+
+    private List<Product> getProducts(ProductDao productDataStore, ProductCategory category, Supplier supplier) {
+        List<Product> products;
+        if (category == null && supplier == null) {
+            products = productDataStore.getAll();
+        } else if (category != null && supplier == null) {
+            products = productDataStore.getBy(category);
+        } else if (supplier != null && category==null) {
+            products = productDataStore.getBy(supplier);
+        } else {
+            products = productDataStore.getBy(supplier, category);
+        }
+        return products;
     }
 
     private void loadPage(HttpServletRequest req, HttpServletResponse resp,
@@ -71,7 +85,7 @@ public class ProductController extends HttpServlet {
                     supplierDataStore.findIdByName(
                             req.getParameter("select_supplier")));
         } else {
-            supplier = supplierDataStore.getDefaultSupplier();
+            supplier = null;
         }
         return supplier;
     }
@@ -85,7 +99,7 @@ public class ProductController extends HttpServlet {
                     productCategoryDataStore.findIdByName(
                             req.getParameter("select_category")));
         } else {
-            category = productCategoryDataStore.getDefaultCategory();
+            category = null;
         }
         return category;
     }

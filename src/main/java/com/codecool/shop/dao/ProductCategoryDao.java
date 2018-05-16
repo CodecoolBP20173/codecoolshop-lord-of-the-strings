@@ -14,7 +14,6 @@ public interface ProductCategoryDao {
     Integer findIdByName(String name);
     ProductCategory getDefaultCategory();
     List<Product> filterProducts(List<Product> products, ProductCategory category);
-
     List<ProductCategory> getAll();
 
 }

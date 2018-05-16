@@ -68,7 +68,6 @@ public class ProductCategoryDaoMem implements ProductCategoryDao {
         return defaultCategory;
     }
 
-    @Override
     public List<Product> filterProducts(List<Product> products, ProductCategory category) {
         if (category.equals(defaultCategory)) {
             return products;

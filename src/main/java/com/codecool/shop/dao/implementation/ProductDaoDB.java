@@ -99,6 +99,19 @@ public class ProductDaoDB implements ProductDao, Queryhandler {
         return buildProductList(results);
     }
 
+    @Override
+    public List<Product> getBy(Supplier supplier, ProductCategory category) {
+        String query = "SELECT id, name, description, default_price, default_currency, product_category, supplier " +
+                "FROM products WHERE product_category = ? AND supplier = ?;";
+        List<Object> parameters = new ArrayList<>();
+        int productCategoryId = category.getId();
+        int supplierId = supplier.getId();
+        parameters.add(productCategoryId);
+        parameters.add(supplierId);
+        List<Map<String, Object>> results = executeSelectQuery(query, parameters);
+        return buildProductList(results);
+    }
+
     public int numberOfProducts() {
         String query = "SELECT COUNT(id) as count FROM products;";
         List<Map<String, Object>> results = executeSelectQuery(query);

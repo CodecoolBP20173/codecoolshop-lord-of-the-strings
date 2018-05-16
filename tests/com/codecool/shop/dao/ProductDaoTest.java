@@ -15,21 +15,16 @@ class ProductDaoTest {
     private ProductDaoDB productDaoDB;
     private Product productToAdd;
     private int numberOfProducts;
-
-
+    
     @BeforeEach
     void setup() {
         productDaoDB = new ProductDaoDB("test_resources/connection.properties");
         this.numberOfProducts = productDaoDB.numberOfProducts();
-
         ProductCategoryDaoDB productCategoryDaoDB = new ProductCategoryDaoDB("test_resources/connection.properties");
-
         int categoryId = productCategoryDaoDB.findIdByName("animal");
         ProductCategory animal = productCategoryDaoDB.find(categoryId);
-
         SupplierDaoDB supplierDaoDB = new SupplierDaoDB("test_resources/connection.properties");
         Supplier zoo = supplierDaoDB.find(supplierDaoDB.findIdByName("Állatkert"));
-
         productToAdd = new Product("rénszarvas", 77, "HUF", "Egy döglött rénszarvas", animal, zoo);
     }
 
@@ -38,7 +33,6 @@ class ProductDaoTest {
         int numberOfProducts = productDaoDB.numberOfProducts();
         productDaoDB.add(productToAdd);
         int numberOfProductsAfter = productDaoDB.numberOfProducts();
-
         assertTrue(numberOfProductsAfter - numberOfProducts == 1);
     }
 
@@ -52,7 +46,6 @@ class ProductDaoTest {
     void testRemoveNumberDecreaseOnRemove() {
         productDaoDB.remove(5);
         int numberOfProductsAfter = productDaoDB.numberOfProducts();
-
         assertTrue(numberOfProducts - numberOfProductsAfter == 1);
     }
 

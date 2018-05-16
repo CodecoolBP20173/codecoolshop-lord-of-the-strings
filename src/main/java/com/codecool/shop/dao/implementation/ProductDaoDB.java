@@ -5,7 +5,6 @@ import com.codecool.shop.model.Product;
 import com.codecool.shop.model.ProductCategory;
 import com.codecool.shop.model.Supplier;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -15,7 +14,7 @@ public class ProductDaoDB implements ProductDao, Queryhandler {
     private String connection_config_path = "src/main/resources/connection.properties";
     private static ProductDaoDB instance = null;
 
-    public ProductDaoDB() {}
+    private ProductDaoDB() {}
 
     public static ProductDaoDB getInstance() {
         if (instance == null) {
@@ -57,7 +56,7 @@ public class ProductDaoDB implements ProductDao, Queryhandler {
         List<Object> parameters = new ArrayList<>();
         parameters.add(id);
         List<Map<String, Object>> results = executeSelectQuery(query, parameters);
-        return buildProductsList(results).get(0);
+        return buildProductList(results).get(0);
 
     }
 
@@ -75,7 +74,7 @@ public class ProductDaoDB implements ProductDao, Queryhandler {
         String query = "SELECT id, name, description, default_price, default_currency, product_category, supplier " +
                 "FROM products;";
         List<Map<String, Object>> results = executeSelectQuery(query);
-        return buildProductsList(results);
+        return buildProductList(results);
     }
 
     @Override
@@ -86,7 +85,7 @@ public class ProductDaoDB implements ProductDao, Queryhandler {
         int supplierId = supplier.getId();
         parameters.add(supplierId);
         List<Map<String, Object>> results = executeSelectQuery(query, parameters);
-        return buildProductsList(results);
+        return buildProductList(results);
     }
 
     @Override
@@ -97,7 +96,7 @@ public class ProductDaoDB implements ProductDao, Queryhandler {
         int productCategoryId = productCategory.getId();
         parameters.add(productCategoryId);
         List<Map<String, Object>> results = executeSelectQuery(query, parameters);
-        return buildProductsList(results);
+        return buildProductList(results);
     }
 
     public int numberOfProducts() {
@@ -112,7 +111,7 @@ public class ProductDaoDB implements ProductDao, Queryhandler {
         executeDMLQuery(query);
     }
 
-    private List<Product> buildProductsList(List<Map<String, Object>> results) {
+    private List<Product> buildProductList(List<Map<String, Object>> results) {
         List<Product> products = new ArrayList<>();
         for (Map<String, Object> result : results) {
             int id = (int) result.get("id");

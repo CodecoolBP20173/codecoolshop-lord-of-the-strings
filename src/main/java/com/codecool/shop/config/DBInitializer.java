@@ -3,26 +3,18 @@ package com.codecool.shop.config;
 import com.codecool.shop.dao.ProductCategoryDao;
 import com.codecool.shop.dao.ProductDao;
 import com.codecool.shop.dao.SupplierDao;
-import com.codecool.shop.dao.implementation.*;
+import com.codecool.shop.dao.implementation.ProductCategoryDaoDB;
+import com.codecool.shop.dao.implementation.ProductDaoDB;
+import com.codecool.shop.dao.implementation.SupplierDaoDB;
 import com.codecool.shop.model.Product;
 import com.codecool.shop.model.ProductCategory;
 import com.codecool.shop.model.Supplier;
 
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
-import javax.servlet.annotation.WebListener;
-
-@WebListener
-public class Initializer implements ServletContextListener {
-
-    @Override
-    public void contextInitialized(ServletContextEvent sce) {
+public class DBInitializer {
+    public static void fillDB() {
         ProductDao productDataStore = ProductDaoDB.getInstance();
         ProductCategoryDao productCategoryDataStore = ProductCategoryDaoDB.getInstance();
         SupplierDao supplierDataStore = SupplierDaoDB.getInstance();
-        productDataStore.removeAllProducts();
-        productCategoryDataStore.removeAll();
-        supplierDataStore.removeAll();
 
         //setting up a new supplier
         Supplier mentorBence = new Supplier("Bence", "Mouse-less computer user");
@@ -61,9 +53,13 @@ public class Initializer implements ServletContextListener {
         productDataStore.add(new Product("Pass the Ball", 10, "USD", "Laci will play any kind of ball game with you for an hour, mocking your miserable skills", specialSkills, mentorLaci));
     }
 
-    private void addWithAllSupplier(SupplierDao supplierDataStore, ProductDao productDataStore, String name, int price, String currency, String desc, ProductCategory category) {
+    static private void addWithAllSupplier(SupplierDao supplierDataStore, ProductDao productDataStore, String name, int price, String currency, String desc, ProductCategory category) {
         for (Supplier supplier : supplierDataStore.getAll()){
             productDataStore.add( new Product(name, price, currency, desc, category, supplier));
         }
+    }
+
+    public static void main(String[] args) {
+        fillDB();
     }
 }

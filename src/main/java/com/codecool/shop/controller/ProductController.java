@@ -123,8 +123,8 @@ public class ProductController extends HttpServlet {
 
         shoppingCartDaoDB.addItem(productId, user.getShoppingCartID());
 
-        float priceSum = shoppingCartDaoDB.sumCart(productId);
-        int numberOfItems = shoppingCartDaoDB.getQuantityOfProductById(productId);
+        float priceSum = shoppingCartDaoDB.sumCart(user.getShoppingCartID());
+        int numberOfItems = shoppingCartDaoDB.getNumberOfItems(user.getShoppingCartID());
 
         JSONObject json = new JSONObject();
         json.put("priceSum", priceSum);

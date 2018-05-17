@@ -3,7 +3,7 @@ package com.codecool.shop.controller;
 import com.codecool.shop.config.TemplateEngineUtil;
 import com.codecool.shop.model.Address;
 import com.codecool.shop.model.Order;
-import com.codecool.shop.model.ShoppingCart;
+import com.codecool.shop.dao.implementation.ShoppingCartDaoDB;
 import com.codecool.shop.model.User;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.WebContext;
@@ -49,8 +49,8 @@ public class CheckoutController extends HttpServlet {
         }
         HttpSession session = request.getSession();
         User user = (User)session.getAttribute("UserObject");
-        ShoppingCart shoppingCart = user.shoppingCart;
-        Order order = new Order(name, email, billAddressObj, shipAddressObj, phone, shoppingCart);
+        int shoppingCartID = user.getShoppingCartID();
+        Order order = new Order(name, email, billAddressObj, shipAddressObj, phone, shoppingCartID);
         user.orders.add(order);
         response.sendRedirect("/payment");
     }

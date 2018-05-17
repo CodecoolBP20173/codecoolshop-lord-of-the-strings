@@ -1,5 +1,6 @@
 package com.codecool.shop.controller;
 
+import com.codecool.shop.dao.ShoppingCartDao;
 import com.codecool.shop.dao.implementation.*;
 import org.json.JSONObject;
 
@@ -32,12 +33,9 @@ public class SnakeCartInitController extends HttpServlet{
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException{
 
-//        ShoppingCart snakeCart = new ShoppingCartDaoDB();
-//
-//        JSONObject json = new JSONObject();
-//        json.put("shoppingCartId", snakeCart.getNewId() );
+        ShoppingCartDaoDB snakeCart = new ShoppingCartDaoDB();
 
-        Integer shoppingCartId = 5;
+        Integer shoppingCartId = snakeCart.getNewId();
 
         response.setContentType("text/plain");
         response.getWriter().print(shoppingCartId.toString());

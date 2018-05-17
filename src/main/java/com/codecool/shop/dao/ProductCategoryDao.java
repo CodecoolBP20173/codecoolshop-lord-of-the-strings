@@ -13,8 +13,6 @@ public interface ProductCategoryDao {
     void removeAll();
     Integer findIdByName(String name);
     ProductCategory getDefaultCategory();
-    List<Product> filterProducts(List<Product> products, ProductCategory category);
-
     List<ProductCategory> getAll();
 
 }

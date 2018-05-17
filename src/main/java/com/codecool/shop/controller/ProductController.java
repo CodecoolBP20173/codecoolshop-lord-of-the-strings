@@ -36,13 +36,62 @@ public class ProductController extends HttpServlet {
 
         TemplateEngine engine = TemplateEngineUtil.getTemplateEngine(req.getServletContext());
         WebContext context = new WebContext(req, resp, req.getServletContext());
-
-
         SupplierDao supplierDataStore = SupplierDaoDB.getInstance();
         ProductDao productDataStore = ProductDaoDB.getInstance();
         ProductCategoryDao productCategoryDataStore = ProductCategoryDaoDB.getInstance();
+        ProductCategory category = getProductCategory(req, productCategoryDataStore);
+        Supplier supplier = getSupplier(req, supplierDataStore);
+        List<Product> products = getProducts(productDataStore, category, supplier);
 
+        if (category == null) category = productCategoryDataStore.getDefaultCategory();
+        if (supplier == null) supplier= supplierDataStore.getDefaultSupplier();
+        loadPage(req, resp, engine, context,
+                supplierDataStore, productCategoryDataStore,
+                category, supplier, products);
+    }
 
+    private List<Product> getProducts(ProductDao productDataStore, ProductCategory category, Supplier supplier) {
+        List<Product> products;
+        if (category == null && supplier == null) {
+            products = productDataStore.getAll();
+        } else if (category != null && supplier == null) {
+            products = productDataStore.getBy(category);
+        } else if (supplier != null && category == null) {
+            products = productDataStore.getBy(supplier);
+        } else {
+            products = productDataStore.getBy(supplier, category);
+        }
+        return products;
+    }
+
+    private void loadPage(HttpServletRequest req, HttpServletResponse resp,
+                          TemplateEngine engine, WebContext context,
+                          SupplierDao supplierDataStore, ProductCategoryDao productCategoryDataStore,
+                          ProductCategory category, Supplier supplier,
+                          List<Product> products) throws IOException {
+        if (req.getParameter("ajax") != null) {
+            sendJson(resp, products);
+        } else {
+            sendHtml(req, resp, engine, context, supplierDataStore,
+                    productCategoryDataStore, category, supplier, products);
+        }
+    }
+
+    private Supplier getSupplier(HttpServletRequest req, SupplierDao supplierDataStore) {
+        Supplier supplier;
+        String selectedSupplier = req.getParameter("select_supplier");
+        if (selectedSupplier != null &&
+                !selectedSupplier.equals(supplierDataStore.getDefaultSupplier().getName())) {
+            supplier = supplierDataStore.find(
+                    supplierDataStore.findIdByName(
+                            req.getParameter("select_supplier")));
+        } else {
+            supplier = null;
+        }
+        return supplier;
+    }
+
+    private ProductCategory getProductCategory(HttpServletRequest req, ProductCategoryDao productCategoryDataStore) {
         ProductCategory category;
         Supplier supplier;
         ShoppingCartDaoDB shoppingCartDaoDB = new ShoppingCartDaoDB();
@@ -61,62 +110,53 @@ public class ProductController extends HttpServlet {
                     productCategoryDataStore.findIdByName(
                             req.getParameter("select_category")));
         } else {
-            category = productCategoryDataStore.getDefaultCategory();
+            category = null;
         }
+        return category;
+    }
 
-        String selectedSupplier = req.getParameter("select_supplier");
-        if (selectedSupplier != null &&
-                !selectedSupplier.equals(supplierDataStore.getDefaultSupplier().getName())) {
-            supplier = supplierDataStore.find(
-                    supplierDataStore.findIdByName(
-                            req.getParameter("select_supplier")));
-        } else {
-            supplier = supplierDataStore.getDefaultSupplier();
+    private void sendJson(HttpServletResponse resp, List<Product> products) throws IOException {
+        JSONObject json = new JSONObject();
+        int numberOfProducts = 0;
+        for (Product product : products) {
+            json.put("Product" + numberOfProducts, new JSONObject()
+                    .put("title", product.getName())
+                    .put("description", product.getDescription())
+                    .put("id", product.getId())
+                    .put("price", product.getPrice())
+                    .put("supplier", product.getSupplier().getName()));
+            numberOfProducts++;
         }
+        resp.setContentType("application/json");
+        resp.getWriter().print(json);
+    }
 
-        List<Product> products = supplierDataStore.filterProducts(
-                productCategoryDataStore.filterProducts(
-                        productDataStore.getAll(), category), supplier);
-
-
-        if (req.getParameter("ajax") != null) {
-            JSONObject json = new JSONObject();
-            int numberOfProducts = 0;
-            for (Product product : products) {
-
-                json.put("Product" + numberOfProducts, new JSONObject()
-                        .put("title", product.getName())
-                        .put("description", product.getDescription())
-                        .put("id", product.getId())
-                        .put("price", product.getPrice())
-                        .put("supplier", product.getSupplier().getName()));
-                numberOfProducts++;
-            }
-
-            resp.setContentType("application/json");
-            resp.getWriter().print(json);
-
-        } else {
-
-            context.setVariable("total_price", shoppingCartDaoDB.sumCart(user.getShoppingCartID()));
-            context.setVariable("number_of_items", shoppingCartDaoDB.getNumberOfItems(user.getShoppingCartID()));
-            context.setVariable("category_list", productCategoryDataStore.getAll());
-            context.setVariable("supplier_list", supplierDataStore.getAll());
-            context.setVariable("category", category);
-            context.setVariable("supplier", supplier);
-            context.setVariable("products", products);
-
-            engine.process("product/index.html", context, resp.getWriter());
+    private void sendHtml(HttpServletRequest req, HttpServletResponse resp,
+                          TemplateEngine engine, WebContext context, SupplierDao supplierDataStore,
+                          ProductCategoryDao productCategoryDataStore, ProductCategory category,
+                          Supplier supplier, List<Product> products)
+            throws IOException {
+        ShoppingCartDaoDB shoppingCartDaoDB = new ShoppingCartDaoDB();
+        HttpSession session = req.getSession();
+        if (session.isNew()) {
+            session.setAttribute("UserObject", new User());
         }
+        User user = (User)session.getAttribute("UserObject");
+        context.setVariable("total_price", shoppingCartDaoDB.sumCart(user.getShoppingCartID()));
+        context.setVariable("number_of_items", shoppingCartDaoDB.getNumberOfItems(user.getShoppingCartID()));
+        context.setVariable("category_list", productCategoryDataStore.getAll());
+        context.setVariable("supplier_list", supplierDataStore.getAll());
+        context.setVariable("category", category);
+        context.setVariable("supplier", supplier);
+        context.setVariable("products", products);
+        engine.process("product/index.html", context, resp.getWriter());
     }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         HttpSession session;
         session = request.getSession();
-        if (session.isNew()) {
-            session.setAttribute("UserObject", new User());
-        }
+        if (session.isNew()) session.setAttribute("UserObject", new User());
         User user = (User) session.getAttribute("UserObject");
         ShoppingCartDaoDB shoppingCartDaoDB = new ShoppingCartDaoDB();
         int productId = Integer.parseInt(request.getParameter("id"));

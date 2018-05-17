@@ -68,17 +68,4 @@ public class ProductCategoryDaoMem implements ProductCategoryDao {
         return defaultCategory;
     }
 
-    @Override
-    public List<Product> filterProducts(List<Product> products, ProductCategory category) {
-        if (category.equals(defaultCategory)) {
-            return products;
-        }
-        List<Product> temp = new ArrayList<>();
-        for (Product product : products) {
-            if (product.getProductCategory().equals(category)) {
-                temp.add(product);
-            }
-        }
-        return temp;
-    }
 }

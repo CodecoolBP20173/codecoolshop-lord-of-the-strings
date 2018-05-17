@@ -18,8 +18,8 @@ import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.HashMap;
 
-@WebServlet (urlPatterns = "/shoppingcart")
-public class ShoppingCartController extends HttpServlet{
+@WebServlet(urlPatterns = "/shoppingcart")
+public class ShoppingCartController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         HttpSession session = request.getSession();
@@ -47,10 +47,8 @@ public class ShoppingCartController extends HttpServlet{
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         HttpSession session = request.getSession();
-        if (session.isNew()) {
-            session.setAttribute("UserObject", new User());
-        }
-        User user = (User)session.getAttribute("UserObject");
+        if (session.isNew()) session.setAttribute("UserObject", new User());
+        User user = (User) session.getAttribute("UserObject");
 
         int shoppingCartId = user.getShoppingCartID();
 
@@ -62,7 +60,6 @@ public class ShoppingCartController extends HttpServlet{
         } else {
             shoppingCartDaoDB.removeItem(productId, shoppingCartId);
         }
-
         JSONObject json = new JSONObject();
         json.put("numOfItems", shoppingCartDaoDB.getQuantityOfProductById(productId, shoppingCartId));
         json.put("total", shoppingCartDaoDB.sumCart(shoppingCartId));

@@ -4,7 +4,6 @@ import com.codecool.shop.dao.implementation.*;
 import org.json.JSONObject;
 
 import com.codecool.shop.model.User;
-import com.codecool.shop.model.ShoppingCart;
 
 import com.codecool.shop.dao.ProductCategoryDao;
 import com.codecool.shop.dao.ProductDao;

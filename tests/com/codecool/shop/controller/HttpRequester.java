@@ -64,7 +64,7 @@ public class HttpRequester {
         return serverResponse.toString();
     }
 
-    public Map<Integer, Integer> sendPostRequest(String parameters) {
+    public String sendPostRequest(String parameters) {
         try {
             composePostRequestHeader(parameters);
 
@@ -93,12 +93,12 @@ public class HttpRequester {
             System.out.println("Error receiving data");
         }
 
-        String jsonString = serverResponse.toString();
+        return serverResponse.toString();
 
-        return parseJsonToMapProducts(jsonString);
+        //return parseJsonToMapProducts(jsonString);
     }
 
-    private Map<String, Integer> parseJsonToMap(String serverResponse) {
+    public Map<String, Integer> parseJsonToMap(String serverResponse) {
         JsonElement element = new JsonParser().parse(serverResponse);
         JsonObject object = element.getAsJsonObject();
         int numberOfItems = object.get("numberOfItems").getAsInt();
@@ -109,7 +109,7 @@ public class HttpRequester {
         return map;
     }
 
-    private Map<Integer, Integer> parseJsonToMapProducts(String serverResponse) {
+    public Map<Integer, Integer> parseJsonToMapProducts(String serverResponse) {
         JsonElement element = new JsonParser().parse(serverResponse);
         JsonObject object = element.getAsJsonObject();
 

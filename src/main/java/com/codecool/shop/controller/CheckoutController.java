@@ -49,8 +49,8 @@ public class CheckoutController extends HttpServlet {
         }
         HttpSession session = request.getSession();
         User user = (User)session.getAttribute("UserObject");
-        ShoppingCartDaoDB shoppingCart = user.shoppingCart;
-        Order order = new Order(name, email, billAddressObj, shipAddressObj, phone, shoppingCart);
+        int shoppingCartID = user.getShoppingCartID();
+        Order order = new Order(name, email, billAddressObj, shipAddressObj, phone, shoppingCartID);
         user.orders.add(order);
         response.sendRedirect("/payment");
     }

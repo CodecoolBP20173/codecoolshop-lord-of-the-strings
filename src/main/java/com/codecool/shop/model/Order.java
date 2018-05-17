@@ -15,10 +15,10 @@ public class Order {
     private Address shippingAddress;
     private int phone;
     private Status status;
-    ShoppingCartDaoDB orderShoppingCart;
+    int orderShoppingCartId;
 
-    public Order(String name, String email, Address billingAddress, Address shippingAddress, int phone, ShoppingCartDaoDB shoppingCart) {
-        this.orderShoppingCart = shoppingCart;
+    public Order(String name, String email, Address billingAddress, Address shippingAddress, int phone, int shoppingCartId) {
+        this.orderShoppingCartId = shoppingCartId;
         this.name = name;
         this.email = email;
         this.billingAddress = billingAddress;

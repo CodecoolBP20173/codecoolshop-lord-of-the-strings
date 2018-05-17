@@ -8,9 +8,9 @@ import java.util.List;
 public class User {
     public List<Order> orders = new ArrayList<>();
     private int shoppingCartID;
+    ShoppingCartDaoDB shoppingCartDaoDB = ShoppingCartDaoDB.getInstance();
 
-    public User () {
-        ShoppingCartDaoDB shoppingCartDaoDB = ShoppingCartDaoDB.getInstance();
+    public User() {
         shoppingCartID = shoppingCartDaoDB.getNewId();
     }
 
@@ -18,7 +18,7 @@ public class User {
         return shoppingCartID;
     }
 
-    public void setShoppingCartID(int shoppingCartID) {
-        this.shoppingCartID = shoppingCartID;
+    public void getNewShoppingCart() {
+        shoppingCartID = shoppingCartDaoDB.getNewId();
     }
 }

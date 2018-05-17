@@ -2,15 +2,13 @@ package com.codecool.shop.dao.implementation;
 
 import com.codecool.shop.dao.ShoppingCartDao;
 import com.codecool.shop.model.Product;
+import com.codecool.shop.model.ProductCategory;
+import com.codecool.shop.model.Supplier;
 
-import java.awt.image.AreaAveragingScaleFilter;
+import java.lang.reflect.MalformedParameterizedTypeException;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.sql.Timestamp;
-import java.util.stream.Stream;
 
 public class ShoppingCartDaoDB implements ShoppingCartDao, Queryhandler {
     private HashMap<Product, Integer> shoppingCartContent = new HashMap<Product, Integer>();
@@ -32,7 +30,7 @@ public class ShoppingCartDaoDB implements ShoppingCartDao, Queryhandler {
     }
 
     public void addItem(int productId, int shoppingCartId) {
-        String query = "INSERT INTO shopping_carts_product (shopping_cart_id, product_id) VALUES (?, ?)";
+        String query = "INSERT INTO shopping_cart_product (shopping_cart_id, product_id) VALUES (?, ?)";
         List<Object> parameters = new ArrayList<>();
         parameters.add(shoppingCartId);
         parameters.add(productId);
@@ -57,36 +55,18 @@ public class ShoppingCartDaoDB implements ShoppingCartDao, Queryhandler {
 
     }
 
-    public HashMap getContent() {
-        return shoppingCartContent;
-    }
-
     public int sumCart(int shopping_cart_id) {
-        String query = "SELECT SUM(default_price) FROM products" +
-                "INNER JOIN shopping_cart_product ON products.id = shopping_cart_product.product_id" +
+        String query = "SELECT SUM(default_price) FROM products " +
+                "INNER JOIN shopping_cart_product ON products.id = shopping_cart_product.product_id " +
                 "WHERE shopping_cart_id = ?;";
         List<Object> parameters = new ArrayList<>();
         parameters.add(shopping_cart_id);
         List<Map<String, Object>> result = executeSelectQuery(query, parameters);
-        return (int) result.get(0).get("sum");
-    }
-
-    public int getNumberOfItemById(int id) {
-        Product productToCount = ProductDaoDB.getInstance().find(id);
-        Product sameProduct = getSameProductFromShoppingCartContent(productToCount);
-        if (sameProduct == null) return 0;
-        return shoppingCartContent.get(sameProduct);
-    }
-
-    private Product getSameProductFromShoppingCartContent(Product searchedProduct) {
-        for (Product product : shoppingCartContent.keySet()) {
-            if (product.getId() == searchedProduct.getId()) return product;
+        try {
+            return ((Long) result.get(0).get("sum")).intValue();
+        } catch (NullPointerException e) {
+            return 0;
         }
-        return null;
-    }
-
-    public int getNumberOfItems() {
-        return shoppingCartContent.values().stream().mapToInt(i -> i).sum();
     }
 
     public void clear() {
@@ -104,17 +84,17 @@ public class ShoppingCartDaoDB implements ShoppingCartDao, Queryhandler {
     }
 
     private List<Map<String, Object>> getNewShoppingCart() {
-        String query = "SELECT * FROM shopping_carts WHERE statuses = ?";
+        String query = "SELECT * FROM shopping_carts WHERE status = ?";
         List<Object> parameters = new ArrayList<>();
         parameters.add(Statuses.NEW.toString());
         List<Map<String, Object>> result = executeSelectQuery(query, parameters);
-        this.changeShoppinCartStatusToOld();
+        this.changeShoppingCartStatusToOld();
         return result;
 
     }
 
-    private void changeShoppinCartStatusToOld() {
-        String query = "UPDATE shopping_carts SET statuses = ? WHERE statuses = ?";
+    private void changeShoppingCartStatusToOld() {
+        String query = "UPDATE shopping_carts SET status = ? WHERE status = ?";
         List<Object> parameters = new ArrayList<>();
         parameters.add(Statuses.OLD.toString());
         parameters.add(Statuses.NEW.toString());
@@ -124,19 +104,55 @@ public class ShoppingCartDaoDB implements ShoppingCartDao, Queryhandler {
     private void newShoppingCart() {
         String query = "INSERT INTO shopping_carts (creation_date, status) VALUES (?, ?)";
         List<Object> parameters = new ArrayList<>();
-        Timestamp timestamp = Timestamp.valueOf(LocalDateTime.now());
-        parameters.add(timestamp.getTime());
+        Calendar cal = Calendar.getInstance();
+        java.sql.Timestamp timestamp = new java.sql.Timestamp(cal.getTimeInMillis());
+        parameters.add(timestamp);
         parameters.add(Statuses.NEW.toString());
         executeDMLQuery(query, parameters);
     }
 
-    private Integer getQuantityOfProduct(int productId) {
+    public Integer getQuantityOfProductById(int productId) {
         String query = "SELECT * FROM shopping_cart_product WHERE product_id = ?";
         List<Object> parameters = new ArrayList<>();
         parameters.add(productId);
         List<Map<String, Object>> result = executeSelectQuery(query, parameters);
         return result.size();
     }
+
+    @Override
+    public int getNumberOfItems(int shoppingCartId) {
+        String query = "SELECT * FROM shopping_cart_product WHERE shopping_cart_id = ?";
+        List<Object> parameters = new ArrayList<>();
+        parameters.add(shoppingCartId);
+        List<Map<String, Object>> result = executeSelectQuery(query, parameters);
+        return result.size();
+    }
+
+    public HashMap<Product, Integer> getContent(int shoppingCartId) {
+        HashMap<Product, Integer> allProduct = new HashMap<>();
+        String query = "SELECT * FROM products " +
+                "INNER JOIN shopping_cart_product ON products.id = shopping_cart_product.product_id " +
+                "WHERE shopping_cart_id = ?;";
+        List<Object> parameters = new ArrayList<>();
+        parameters.add(shoppingCartId);
+        List<Map<String, Object>> result = executeSelectQuery(query, parameters);
+        SupplierDaoDB supplierDaoDB = new SupplierDaoDB();
+        ProductCategoryDaoDB productCategoryDaoDB = new ProductCategoryDaoDB();
+        for (Map<String, Object> product : result) {
+            Integer quantityOfProduct = this.getQuantityOfProductById((Integer)product.get("product_id"));
+            Product newProduct = new Product(
+                    (String) product.get("name"),
+                    (Integer) product.get("default_price"),
+                    (String) product.get("default_currency"),
+                    (String) product.get("description"),
+                    productCategoryDaoDB.find((Integer) product.get("product_category")),
+                    supplierDaoDB.find((Integer)product.get("supplier"))
+                    );
+            allProduct.put(newProduct, quantityOfProduct);
+        }
+        return allProduct;
+    }
+
 
     private enum Statuses {
         NEW, OLD

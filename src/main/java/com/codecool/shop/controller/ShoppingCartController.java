@@ -1,5 +1,7 @@
 package com.codecool.shop.controller;
 
+import com.codecool.shop.dao.ShoppingCartDao;
+import com.codecool.shop.model.Product;
 import org.json.JSONObject;
 import com.codecool.shop.config.TemplateEngineUtil;
 import com.codecool.shop.dao.implementation.ShoppingCartDaoDB;
@@ -14,6 +16,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
+import java.util.HashMap;
 
 @WebServlet (urlPatterns = "/shoppingcart")
 public class ShoppingCartController extends HttpServlet{
@@ -25,14 +28,18 @@ public class ShoppingCartController extends HttpServlet{
         }
         User user = (User)session.getAttribute("UserObject");
 
-        ShoppingCartDaoDB shoppingCart = user.shoppingCart;
+        int shoppingCartID = user.getShoppingCartID();
 
 
 
         TemplateEngine engine = TemplateEngineUtil.getTemplateEngine(request.getServletContext());
         WebContext context = new WebContext(request, response, request.getServletContext());
 
-        context.setVariable("shoppingcart", shoppingCart);
+        ShoppingCartDaoDB shoppingCartDaoDB = new ShoppingCartDaoDB();
+        HashMap<Product, Integer> shoppingCartContent = shoppingCartDaoDB.getContent(shoppingCartID);
+        context.setVariable("shoppingcart", shoppingCartContent);
+        context.setVariable("shoppingCartDaoDB", shoppingCartDaoDB);
+        context.setVariable("shoppingCartId", shoppingCartID);
 
         engine.process("shoppingcart/shoppingcart.html", context, response.getWriter());
     }
@@ -45,19 +52,20 @@ public class ShoppingCartController extends HttpServlet{
         }
         User user = (User)session.getAttribute("UserObject");
 
-        ShoppingCartDaoDB shoppingCart = user.shoppingCart;
+        int shoppingCartId = user.getShoppingCartID();
 
-        int id = Integer.parseInt(request.getParameter("id"));
+        int productId = Integer.parseInt(request.getParameter("id"));
+        ShoppingCartDaoDB shoppingCartDaoDB = new ShoppingCartDaoDB();
 
         if (request.getParameter("process").equals("increase")) {
-            shoppingCart.addItem(id);
+            shoppingCartDaoDB.addItem(productId, shoppingCartId);
         } else {
-            shoppingCart.removeItem(id);
+            shoppingCartDaoDB.removeItem(productId, shoppingCartId);
         }
 
         JSONObject json = new JSONObject();
-        json.put("numOfItems", shoppingCart.getNumberOfItemById(id));
-        json.put("total", shoppingCart.sumCart());
+        json.put("numOfItems", shoppingCartDaoDB.getQuantityOfProductById(productId));
+        json.put("total", shoppingCartDaoDB.sumCart(productId));
 
         response.setContentType("application/json");
         response.getWriter().print(json);

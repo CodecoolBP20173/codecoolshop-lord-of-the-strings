@@ -1,5 +1,6 @@
 package com.codecool.shop.controller;
 
+import com.codecool.shop.dao.ShoppingCartDao;
 import com.codecool.shop.dao.implementation.*;
 import org.json.JSONObject;
 
@@ -44,6 +45,14 @@ public class ProductController extends HttpServlet {
 
         ProductCategory category;
         Supplier supplier;
+        ShoppingCartDaoDB shoppingCartDaoDB = new ShoppingCartDaoDB();
+        HttpSession session;
+        session = req.getSession();
+        if (session.isNew()) {
+            session.setAttribute("UserObject", new User());
+        }
+        User user = (User) session.getAttribute("UserObject");
+
 
         String selectedCategory = req.getParameter("select_category");
         if (selectedCategory != null &&
@@ -88,10 +97,9 @@ public class ProductController extends HttpServlet {
             resp.getWriter().print(json);
 
         } else {
-            ShoppingCartDaoDB shoppingCart = getShoppingCart(req);
 
-            context.setVariable("total_price", shoppingCart.sumCart());
-            context.setVariable("number_of_items", shoppingCart.getNumberOfItems());
+            context.setVariable("total_price", shoppingCartDaoDB.sumCart(user.getShoppingCartID()));
+            context.setVariable("number_of_items", shoppingCartDaoDB.getNumberOfItems(user.getShoppingCartID()));
             context.setVariable("category_list", productCategoryDataStore.getAll());
             context.setVariable("supplier_list", supplierDataStore.getAll());
             context.setVariable("category", category);
@@ -104,14 +112,19 @@ public class ProductController extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        HttpSession session;
+        session = request.getSession();
+        if (session.isNew()) {
+            session.setAttribute("UserObject", new User());
+        }
+        User user = (User) session.getAttribute("UserObject");
+        ShoppingCartDaoDB shoppingCartDaoDB = new ShoppingCartDaoDB();
+        int productId = Integer.parseInt(request.getParameter("id"));
 
-        String productId = request.getParameter("id");
-        ShoppingCartDaoDB shoppingCart = getShoppingCart(request);
+        shoppingCartDaoDB.addItem(productId, user.getShoppingCartID());
 
-        shoppingCart.addItem(Integer.parseInt(productId));
-
-        float priceSum = shoppingCart.sumCart();
-        int numberOfItems = shoppingCart.getNumberOfItems();
+        float priceSum = shoppingCartDaoDB.sumCart(productId);
+        int numberOfItems = shoppingCartDaoDB.getQuantityOfProductById(productId);
 
         JSONObject json = new JSONObject();
         json.put("priceSum", priceSum);
@@ -119,16 +132,6 @@ public class ProductController extends HttpServlet {
 
         response.setContentType("application/json");
         response.getWriter().print(json);
-    }
-
-    private ShoppingCartDaoDB getShoppingCart(HttpServletRequest request) {
-        HttpSession session;
-        session = request.getSession();
-        if (session.isNew()) {
-            session.setAttribute("UserObject", new User());
-        }
-        User user = (User) session.getAttribute("UserObject");
-        return user.shoppingCart;
     }
 
 }

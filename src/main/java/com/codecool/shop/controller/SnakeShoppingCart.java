@@ -25,14 +25,14 @@ public class SnakeShoppingCart extends HttpServlet{
         }
         User user = (User)session.getAttribute("UserObject");
 
-        ShoppingCartDaoDB shoppingCart = user.shoppingCart;
+        int shoppingCartId = user.getShoppingCartID();
 
 
 
         TemplateEngine engine = TemplateEngineUtil.getTemplateEngine(request.getServletContext());
         WebContext context = new WebContext(request, response, request.getServletContext());
 
-        context.setVariable("shoppingcart", shoppingCart);
+        context.setVariable("shoppingcart", shoppingCartId);
 
         engine.process("snake_shoppingcart/snake_shoppingcart.html", context, response.getWriter());
     }
@@ -43,10 +43,6 @@ public class SnakeShoppingCart extends HttpServlet{
         if (session.isNew()) {
             session.setAttribute("UserObject", new User());
         }
-        User user = (User)session.getAttribute("UserObject");
-
-        ShoppingCartDaoDB shoppingCart = user.shoppingCart;
-
         JSONObject json = new JSONObject();
 //        json.put("numOfItems", shoppingCart.getNumberOfItemById(id));
 //        json.put("total", shoppingCart.sumCart());

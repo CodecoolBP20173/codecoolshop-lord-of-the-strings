@@ -24,7 +24,8 @@ class SnakeProductControllerTest {
     @Test
     void test_doPost_happy_path() {
         HttpRequester requester = new HttpRequester("http://localhost:8080/snake-products");
-        Map<Integer, Integer> productData = requester.sendPostRequest("");
+        String serverResponse = requester.sendPostRequest("");
+        Map<Integer, Integer> productData = requester.parseJsonToMapProducts(serverResponse);
         int[] resultList = {10, 10, 10, 10, 10};
         int idOffset = 31;
         for (int i = 0; i < 5 ; i++) {

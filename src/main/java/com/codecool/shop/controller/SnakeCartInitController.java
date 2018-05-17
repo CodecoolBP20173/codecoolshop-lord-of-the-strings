@@ -33,12 +33,14 @@ public class SnakeCartInitController extends HttpServlet{
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException{
 
-        ShoppingCart snakeCart = new ShoppingCartDaoDB();
+//        ShoppingCart snakeCart = new ShoppingCartDaoDB();
+//
+//        JSONObject json = new JSONObject();
+//        json.put("shoppingCartId", snakeCart.getNewId() );
 
-        JSONObject json = new JSONObject();
-        json.put("shoppingCartId", snakeCart.getNewId() );
+        Integer shoppingCartId = 5;
 
-        response.setContentType("application/json");
-        response.getWriter().print(json);
+        response.setContentType("text");
+        response.getWriter().print(shoppingCartId.toString());
     }
 }

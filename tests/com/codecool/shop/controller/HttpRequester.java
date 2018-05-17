@@ -4,6 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -32,6 +33,37 @@ public class HttpRequester {
         }
     }
 
+    public String rawPostRequest(String parameters) {
+        try {
+            composePostRequestHeader(parameters);
+
+            DataOutputStream connectionDataOutputStream = new DataOutputStream(connection.getOutputStream());
+            connectionDataOutputStream.writeBytes(parameters);
+            connectionDataOutputStream.flush();
+
+            int responseCode = connection.getResponseCode();
+            System.out.println("\nSending 'POST' request to URL : " + connection.getURL());
+            System.out.println("Post content type : " + connection.getRequestProperty("Content-Type"));
+            System.out.println("Post parameters : " + parameters);
+            System.out.println("Response Code : " + responseCode);
+        } catch (IOException e) {
+            System.out.println("Error sending data");
+        }
+
+        StringBuilder serverResponse = new StringBuilder();
+
+        try (BufferedReader connectionDataInputStream = new BufferedReader(
+                new InputStreamReader(connection.getInputStream()));) {
+            String inputLine;
+            while ((inputLine = connectionDataInputStream.readLine()) != null) {
+                serverResponse.append(inputLine);
+            }
+        } catch (IOException e) {
+            System.out.println("Error receiving data");
+        }
+        return serverResponse.toString();
+    }
+
     public Map<Integer, Integer> sendPostRequest(String parameters) {
         try {
             composePostRequestHeader(parameters);
@@ -52,7 +84,7 @@ public class HttpRequester {
         StringBuilder serverResponse = new StringBuilder();
 
         try (BufferedReader connectionDataInputStream = new BufferedReader(
-                new InputStreamReader(connection.getInputStream()));){
+                new InputStreamReader(connection.getInputStream()));) {
             String inputLine;
             while ((inputLine = connectionDataInputStream.readLine()) != null) {
                 serverResponse.append(inputLine);
@@ -88,7 +120,7 @@ public class HttpRequester {
 
         for (int i = 0; i < productIdList.size(); i++) {
             Integer index = productIdList.get(i).getAsInt();
-            productData.put(index, productDataObject.get(index.toString()).getAsInt() );
+            productData.put(index, productDataObject.get(index.toString()).getAsInt());
         }
         return productData;
     }

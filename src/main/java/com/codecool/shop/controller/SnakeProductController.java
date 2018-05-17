@@ -1,7 +1,6 @@
 package com.codecool.shop.controller;
 
 import com.codecool.shop.dao.implementation.*;
-import com.google.gson.*;
 import org.json.JSONObject;
 
 import com.codecool.shop.model.User;
@@ -35,12 +34,11 @@ public class SnakeProductController extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException{
 
-        ProductDaoDB productDAO = ProductDaoDB.getInstance();
-        ProductCategoryDaoDB productCategoryDAO = ProductCategoryDaoDB.getInstance();
+        ProductDao productDAO = ProductDaoDB.getInstance();
+        ProductCategoryDao productCategoryDAO = ProductCategoryDaoDB.getInstance();
 
-        List<Product> products = productDAO.getAll();
         ProductCategory special = productCategoryDAO.find(productCategoryDAO.findIdByName("Special skills"));
-        products = productCategoryDAO.filterProducts(products, special);
+        List<Product> products = productDAO.getBy(special);
 
         JSONObject json = new JSONObject();
 

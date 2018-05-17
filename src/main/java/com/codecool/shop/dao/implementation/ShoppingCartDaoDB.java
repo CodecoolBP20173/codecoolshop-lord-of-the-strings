@@ -111,12 +111,14 @@ public class ShoppingCartDaoDB implements ShoppingCartDao, Queryhandler {
         executeDMLQuery(query, parameters);
     }
 
-    public Integer getQuantityOfProductById(int productId) {
-        String query = "SELECT * FROM shopping_cart_product WHERE product_id = ?";
+    public Integer getQuantityOfProductById(int productId, int shoppingCartId) {
+        String query = "SELECT COUNT(product_id) FROM shopping_cart_product WHERE shopping_cart_id = ? AND product_id = ? " +
+                "GROUP BY product_id";
         List<Object> parameters = new ArrayList<>();
+        parameters.add(shoppingCartId);
         parameters.add(productId);
         List<Map<String, Object>> result = executeSelectQuery(query, parameters);
-        return result.size();
+        return ((Long) result.get(0).get("count")).intValue();
     }
 
     @Override
@@ -130,7 +132,9 @@ public class ShoppingCartDaoDB implements ShoppingCartDao, Queryhandler {
 
     public HashMap<Product, Integer> getContent(int shoppingCartId) {
         HashMap<Product, Integer> allProduct = new HashMap<>();
-        String query = "SELECT * FROM products " +
+        String query = "SELECT DISTINCT name, description, " +
+                "default_price, default_currency, product_category, " +
+                "supplier, shopping_cart_id, product_id FROM products " +
                 "INNER JOIN shopping_cart_product ON products.id = shopping_cart_product.product_id " +
                 "WHERE shopping_cart_id = ?;";
         List<Object> parameters = new ArrayList<>();
@@ -139,7 +143,7 @@ public class ShoppingCartDaoDB implements ShoppingCartDao, Queryhandler {
         SupplierDaoDB supplierDaoDB = new SupplierDaoDB();
         ProductCategoryDaoDB productCategoryDaoDB = new ProductCategoryDaoDB();
         for (Map<String, Object> product : result) {
-            Integer quantityOfProduct = this.getQuantityOfProductById((Integer)product.get("product_id"));
+            Integer quantityOfProduct = this.getQuantityOfProductById((Integer)product.get("product_id"), shoppingCartId);
             Product newProduct = new Product(
                     (String) product.get("name"),
                     (Integer) product.get("default_price"),

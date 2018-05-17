@@ -16,7 +16,7 @@
 
     <div id="shoppingcart_field" class="lots-justify-content-around">
 
-        <div class="lots-product_wrapper" th:each="element : ${shoppingCartContent}" th:id="'productItem_' + ${element.key.id}">
+        <div class="lots-product_wrapper" th:each="element : ${shoppingcart}" th:id="'productItem_' + ${element.key.id}">
             <div class="lots-shoppingcart_product">
                 <div class="lots-top_divider"></div>
                 <h4 class="lots-supplier_text" th:text="${element.key.supplier.getName()}">Supplier name</h4>

@@ -40,7 +40,7 @@ public class SnakeCartInitController extends HttpServlet{
 
         Integer shoppingCartId = 5;
 
-        response.setContentType("text");
+        response.setContentType("text/plain");
         response.getWriter().print(shoppingCartId.toString());
     }
 }

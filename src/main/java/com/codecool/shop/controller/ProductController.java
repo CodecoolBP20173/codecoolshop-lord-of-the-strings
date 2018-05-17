@@ -160,11 +160,18 @@ public class ProductController extends HttpServlet {
         User user = (User) session.getAttribute("UserObject");
         ShoppingCartDaoDB shoppingCartDaoDB = new ShoppingCartDaoDB();
         int productId = Integer.parseInt(request.getParameter("id"));
+        
+        Integer shoppingCartID;
+        if (request.getParameter("shoppingcart_id") != null) {
+            shoppingCartID = Integer.parseInt(request.getParameter("shoppingcart_id"));
+        } else {
+            shoppingCartID = user.getShoppingCartID();
+        }
 
-        shoppingCartDaoDB.addItem(productId, user.getShoppingCartID());
+        shoppingCartDaoDB.addItem(productId, shoppingCartID);
 
-        float priceSum = shoppingCartDaoDB.sumCart(user.getShoppingCartID());
-        int numberOfItems = shoppingCartDaoDB.getNumberOfItems(user.getShoppingCartID());
+        float priceSum = shoppingCartDaoDB.sumCart(shoppingCartID);
+        int numberOfItems = shoppingCartDaoDB.getNumberOfItems(shoppingCartID);
 
         JSONObject json = new JSONObject();
         json.put("priceSum", priceSum);

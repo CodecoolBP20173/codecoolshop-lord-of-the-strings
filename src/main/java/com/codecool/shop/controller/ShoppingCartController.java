@@ -65,7 +65,7 @@ public class ShoppingCartController extends HttpServlet{
 
         JSONObject json = new JSONObject();
         json.put("numOfItems", shoppingCartDaoDB.getQuantityOfProductById(productId, shoppingCartId));
-        json.put("total", shoppingCartDaoDB.sumCart(productId));
+        json.put("total", shoppingCartDaoDB.sumCart(shoppingCartId));
 
         response.setContentType("application/json");
         response.getWriter().print(json);

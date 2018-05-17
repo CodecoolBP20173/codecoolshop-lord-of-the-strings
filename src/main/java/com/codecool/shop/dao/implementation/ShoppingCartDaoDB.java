@@ -51,7 +51,11 @@ public class ShoppingCartDaoDB implements ShoppingCartDao, Queryhandler {
         parameters.add(shoppingCartId);
         parameters.add(productId);
         List<Map<String, Object>> result = executeSelectQuery(query, parameters);
-        return (int) result.get(0).get("id");
+        if (result.size() == 0) {
+            return 0;
+        } else {
+            return (int) result.get(0).get("id");
+        }
 
     }
 
@@ -118,7 +122,11 @@ public class ShoppingCartDaoDB implements ShoppingCartDao, Queryhandler {
         parameters.add(shoppingCartId);
         parameters.add(productId);
         List<Map<String, Object>> result = executeSelectQuery(query, parameters);
-        return ((Long) result.get(0).get("count")).intValue();
+        if (result.size() == 0) {
+            return 0;
+        } else {
+            return ((Long) result.get(0).get("count")).intValue();
+        }
     }
 
     @Override
@@ -143,15 +151,16 @@ public class ShoppingCartDaoDB implements ShoppingCartDao, Queryhandler {
         SupplierDaoDB supplierDaoDB = new SupplierDaoDB();
         ProductCategoryDaoDB productCategoryDaoDB = new ProductCategoryDaoDB();
         for (Map<String, Object> product : result) {
-            Integer quantityOfProduct = this.getQuantityOfProductById((Integer)product.get("product_id"), shoppingCartId);
+            Integer quantityOfProduct = this.getQuantityOfProductById((Integer) product.get("product_id"), shoppingCartId);
             Product newProduct = new Product(
                     (String) product.get("name"),
                     (Integer) product.get("default_price"),
                     (String) product.get("default_currency"),
                     (String) product.get("description"),
                     productCategoryDaoDB.find((Integer) product.get("product_category")),
-                    supplierDaoDB.find((Integer)product.get("supplier"))
-                    );
+                    supplierDaoDB.find((Integer) product.get("supplier"))
+            );
+            newProduct.setId((Integer) product.get("product_id"));
             allProduct.put(newProduct, quantityOfProduct);
         }
         return allProduct;

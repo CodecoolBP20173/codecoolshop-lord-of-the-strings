@@ -45,12 +45,15 @@ public class SnakeProductController extends HttpServlet {
         JSONObject json = new JSONObject();
 
         Map<Integer, Integer> productData = new HashMap<>();
+        List<Integer> productIdList = new ArrayList<>();
 
         for (Product currentProcduct : products){
             productData.put(currentProcduct.getId(), currentProcduct.getDefaultPrice());
+            productIdList.add(currentProcduct.getId());
         }
 
-        json.put("productIDList", productData );
+        json.put("productIdList", productIdList);
+        json.put("productData", productData );
 
         response.setContentType("application/json");
         response.getWriter().print(json);

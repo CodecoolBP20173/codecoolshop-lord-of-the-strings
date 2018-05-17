@@ -26,7 +26,9 @@ import javax.servlet.http.HttpSession;
 import javax.xml.ws.http.HTTPException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @WebServlet(urlPatterns = {"/snake-products"})
 public class SnakeProductController extends HttpServlet {
@@ -42,13 +44,13 @@ public class SnakeProductController extends HttpServlet {
 
         JSONObject json = new JSONObject();
 
-        List<Integer> productIDs = new ArrayList<>();
+        Map<Integer, Integer> productData = new HashMap<>();
 
         for (Product currentProcduct : products){
-            productIDs.add(currentProcduct.getId());
+            productData.put(currentProcduct.getId(), currentProcduct.getDefaultPrice());
         }
 
-        json.put("productIDList", productIDs );
+        json.put("productIDList", productData );
 
         response.setContentType("application/json");
         response.getWriter().print(json);

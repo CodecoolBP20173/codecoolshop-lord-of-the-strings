@@ -16,7 +16,7 @@
 
     <div id="shoppingcart_field" class="lots-justify-content-around">
 
-        <div class="lots-product_wrapper" th:each="element : ${shoppingcart.getContent()}" th:id="'productItem_' + ${element.key.id}">
+        <div class="lots-product_wrapper" th:each="element : ${shoppingcart}" th:id="'productItem_' + ${element.key.id}">
             <div class="lots-shoppingcart_product">
                 <div class="lots-top_divider"></div>
                 <h4 class="lots-supplier_text" th:text="${element.key.supplier.getName()}">Supplier name</h4>
@@ -30,16 +30,15 @@
                     </div>
                 </div>
             </div>
+            <div class="lots-justify-content-center">
+                <span class="quantity_field" th:text="${element.value}">1</span>
+            </div>
         </div>
 
     </div>
     <div class="row justify-content-end">
-        <div class="lots-shopcart_total_price_wrapper">
-            <div id="total_price_field" class="lots_price" th:text="${shoppingcart.sumCart()}">100</div>
-            <div class="lots-currency-icon"></div>
-        </div>
         <div class="go-to-chekout text-center">
-            <a  class="go-to-checkout-btn" href="/checkout">
+            <a  class="go-to-checkout-btn" href="/snake-thanks-for-playing">
                 <img src="/static/img/pay.png" alt="" class="lots-pay-png">
             </a>
         </div>

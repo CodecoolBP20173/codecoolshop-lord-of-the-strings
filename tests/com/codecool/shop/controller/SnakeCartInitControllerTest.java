@@ -9,7 +9,7 @@ class SnakeCartInitControllerTest {
     @Test
     void test_doPost_happy_path() {
         HttpRequester requester = new HttpRequester("http://localhost:8080/snake-cart");
-        String cartID = requester.rawPostRequest("");
+        String cartID = requester.sendPostRequest("");
         assertEquals("5", cartID);
     }
 
